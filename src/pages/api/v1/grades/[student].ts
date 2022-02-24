@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next"
-import fetcher from "../../../../utils/fetcher"
+import fetcher from "src/utils/fetcher"
 
 const apiKey = process.env.AIRTABLE_KEY
 const base = process.env.AIRTABLE_BASE

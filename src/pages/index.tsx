@@ -1,8 +1,8 @@
 import type { NextPage } from "next"
 import { FormEvent, useState } from "react"
 import useSWR from "swr"
-import fetcher from "../utils/fetcher"
-import { StudentGrade } from "./api/v1/grades/[student]"
+import fetcher from "src/utils/fetcher"
+import { StudentGrade } from "src/pages/api/v1/grades/[student]"
 
 const studentApiKey = (student?: string) => {
 	if (!student) throw new Error("missing student")
