@@ -15,12 +15,13 @@ const useStudentGrade = (student?: string) =>
 const sortObjectByKeys = (o: Record<string, string>) =>
 	Object.keys(o)
 		.sort()
+		// @ts-expect-error i’m lazy to type this
 		.reduce((r, k) => ((r[k] = o[k]), r), {})
 
 const Home: NextPage = () => {
 	const [student, setStudent] = useState("")
 	const [search, setSearch] = useState("")
-	const { data, isValidating, error } = useStudentGrade(search)
+	const { data, isValidating } = useStudentGrade(search)
 
 	const onSubmit = (e: FormEvent) => {
 		e.preventDefault()
@@ -70,7 +71,8 @@ const Home: NextPage = () => {
 				<button disabled={!student}>search</button>
 			</form>
 			{errorMessage && <pre>{errorMessage}</pre>}
-			{sortedData && (
+			{isValidating && !data && <pre>loading...</pre>}
+			{!errorMessage && sortedData && (
 				<table>
 					<thead>
 						<tr>
