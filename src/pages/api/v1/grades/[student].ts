@@ -36,9 +36,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<unknown>) => {
 			compareLowercase(x["github handle"], student)
 		)
 
-		console.log({ studentData, allStudentsData, data })
-
-		if (!studentData) res.status(404).json({ message: "not found" })
+		if (!studentData) return res.status(404).json({ message: "not found" })
 		return res.status(200).json(studentData)
 	} catch {
 		console.log("500 error")
