@@ -1,5 +1,5 @@
 import type { NextPage } from "next"
-import { useState } from "react"
+import { FormEvent, useState } from "react"
 import useSWR from "swr"
 import fetcher from "../utils/fetcher"
 import { StudentGrade } from "./api/v1/grades/[student]"
@@ -8,18 +8,99 @@ const studentApiKey = (student?: string) => {
 	if (!student) throw new Error("missing student")
 	return `/api/v1/grades/${student}`
 }
+
 const useStudentGrade = (student?: string) =>
 	useSWR<StudentGrade>(() => studentApiKey(student), fetcher)
 
+const sortObjectByKeys = (o: Record<string, string>) =>
+	Object.keys(o)
+		.sort()
+		.reduce((r, k) => ((r[k] = o[k]), r), {})
+
 const Home: NextPage = () => {
 	const [student, setStudent] = useState("")
-	const { data, isValidating, error } = useStudentGrade(student)
+	const [search, setSearch] = useState("")
+	const { data, isValidating, error } = useStudentGrade(search)
+
+	const onSubmit = (e: FormEvent) => {
+		e.preventDefault()
+		setSearch(student)
+	}
+
+	const errorMessage = data?.message
+	const githubHandle = data?.["github handle"]
+	const sortedData = data && sortObjectByKeys(data)
 
 	return (
-		<div>
-			<input value={student} onChange={e => setStudent(e.target.value)} />
-			<pre>{JSON.stringify({ data, isValidating, error })}</pre>
-		</div>
+		<>
+			<style>
+				{`
+          body {
+            font-family: sans-serif;
+          }
+
+          table {
+            border-collapse: collapse;
+            margin: 25px 0;
+            font-size: 0.9em;
+            text-align: left;
+            min-width: 400px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+          }
+
+          table thead tr {
+              background-color: #009879;
+              color: #ffffff;
+              text-align: left;
+          }
+
+          table th,
+          table td {
+              padding: 12px 15px;
+              font-weight: default !important;
+          }
+
+          table tbody tr {
+              border-bottom: 1px solid #dddddd;
+          }
+        `}
+			</style>
+			<form onSubmit={onSubmit}>
+				<input value={student} onChange={e => setStudent(e.target.value)} />
+				<button disabled={!student}>search</button>
+			</form>
+			{errorMessage && <pre>{errorMessage}</pre>}
+			{sortedData && (
+				<table>
+					<thead>
+						<tr>
+							{Object.keys(sortedData).map(k => (
+								<th key={k}>{k}</th>
+							))}
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							{Object.values<string | number | undefined>(sortedData).map(
+								(k, i) => (
+									<th key={i}>
+										{!k?.toString().includes("github.com") ? (
+											k
+										) : (
+											<a href={k.toString()}>
+												{k
+													.toString()
+													.replace(`https://github.com/${githubHandle}`, "")}
+											</a>
+										)}
+									</th>
+								)
+							)}
+						</tr>
+					</tbody>
+				</table>
+			)}
+		</>
 	)
 }
 
