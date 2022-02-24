@@ -67,7 +67,11 @@ const Home: NextPage = () => {
         `}
 			</style>
 			<form onSubmit={onSubmit}>
-				<input value={student} onChange={e => setStudent(e.target.value)} />
+				<input
+					value={student}
+					onChange={e => setStudent(e.target.value)}
+					placeholder="github user"
+				/>
 				<button disabled={!student}>search</button>
 			</form>
 			{errorMessage && <pre>{errorMessage}</pre>}
